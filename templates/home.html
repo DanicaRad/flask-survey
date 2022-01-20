@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}Home{% endblock %}
 {% block content %}  
-<h1>{{Title}}</h1>
+<div>
+    <h1>{{title}}</h1>
     <h3>{{instructions}}</h3>
     <button><a href="/session">Start Survey!</a></button>
+</div>
+<div class="change-version">
+    <a href="/" class="change-version">CHOOSE A DIFFERENT SURVEY</a>
+</div>
 {% endblock %}

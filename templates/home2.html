@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}  
+<h1>{{Title}}</h1>
+{% for survey in surveys %}
+    <h1>{{surveys[survey].title}}</h1>
+    <p>{{surveys[survey].instructions}}</p>
+    <button><a href="/session/{{survey}}">Start {{survey.title()}} Survey!</a></button>
+{% endfor %}
+<div class="change-version">
+    <a href="/home" class="change-version">
+        Go back to the OG single survey page
+    </a>
+</div>
+{% endblock%}
