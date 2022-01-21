@@ -1,7 +1,8 @@
 # "http.client..." just appeared here... i think. what is this?
 # from http.client import responses
 from http.client import responses
-from flask import Flask, request, render_template, redirect, flash, session
+from turtle import title
+from flask import Flask, request, render_template, redirect, flash, session, make_response
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import surveys, satisfaction_survey, personality_quiz
 
@@ -28,9 +29,8 @@ def setup_session():
 
 @app.route('/questions/<int:num>')
 def show_question_form(num):
-    print(f"LENGTH: {len(session['responses'])}")
-
     next_q = len(session['responses'])
+
     if next_q == len(satisfaction_survey.questions):
         flash("Survey is already complete, thank you!", "error")
         return redirect('/thankyou')
@@ -67,32 +67,45 @@ def survey_completion_thankyou():
 @app.route('/session/<survey>', methods=['POST', 'GET'])
 def survey_session(survey):
     session[survey] = []
-    print(f"survey list: {session[survey]}")
     return redirect(f'/{survey}/questions')
 
 @app.route('/<survey>/questions/')
 def show_questions(survey):
     num = len(session[survey])
     questions = surveys[survey].questions
-    print(f"num: {num}, {surveys[survey].questions[num]}")
+
+    if request.cookies.get(f"{survey}"):
+        flash(f"You've already submitted the {surveys[survey].title}", "error")
+        return redirect(F'/{survey}/thankyou')
 
     if num == len(surveys[survey].questions):
         flash("Survey is already complete, thank you!", "error")
-        return redirect('/thankyou')
+        return redirect(f'/{survey}/thankyou')
     else:
         return render_template('questions2.html', num=num, questions=questions, survey=survey)
 
 @app.route('/<survey>/answers', methods=['POST'])
 def get_surveys_answers(survey):
+    print(f"REQUEST: {request}")
+
     responses = session[survey]
     num = len(responses)
-    response = list(request.form.values())
-    responses.extend(response)
+    response = dict(request.form)
+    responses.append(response)
     session[survey] = responses
-
-    print(session[survey])
     
     if num + 1 == len(surveys[survey].questions):
-        return redirect('/thankyou')
+        return redirect(f'/{survey}/set-cookie')
     else:
         return redirect(f'/{survey}/questions')
+
+@app.route('/<survey>/thankyou')
+def mult_survey_thanks(survey):
+    return render_template('thankyou2.html', survey=survey, surveys=surveys)
+
+@app.route('/<survey>/set-cookie')
+def set_completed_cookie(survey):
+    content = redirect(f'/{survey}/thankyou')
+    res = make_response(content)
+    res.set_cookie(f"{survey}", "submitted")
+    return res

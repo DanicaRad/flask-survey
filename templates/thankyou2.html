@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Thank You 2{% endblock %}
+{% block content %}  
+<h1>Thank you for taking our {{surveys[survey].title}}!</h1>
+<h3>You responded...</h3>
+{% for q_a in session[survey] %}
+    {% for (key, val) in q_a.items() %}
+        {% if key == 'comments' %}
+            <p class="answer"><span class="comments">{{key}}:</span> {{val}}</p>
+        {% else %}
+            <p class="question">{{key}}</p>
+            <p class="answer">{{val}}</p>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+<button><a href="/">Back to homepage</a></button>
+{% endblock %}
