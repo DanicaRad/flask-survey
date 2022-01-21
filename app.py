@@ -86,8 +86,6 @@ def show_questions(survey):
 
 @app.route('/<survey>/answers', methods=['POST'])
 def get_surveys_answers(survey):
-    print(f"REQUEST: {request}")
-
     responses = session[survey]
     num = len(responses)
     response = dict(request.form)
